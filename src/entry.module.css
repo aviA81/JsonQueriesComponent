@@ -1,0 +1,20 @@
+.entry {
+  display: flex;
+  padding: 2.5rem;
+}
+
+.key {
+  align-self: center;
+  font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+  font-size: 1.33rem;
+  font-weight: bold;
+  border: none;
+  outline: none;
+}
+
+.value {
+  font-family: 'Courier New', Courier, monospace;
+  line-height: 1.5;
+  flex: 1;
+  height: 7rem;
+}
