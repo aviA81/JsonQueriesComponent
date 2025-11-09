@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
 import styles from './entry.module.css';
 
-const Entry = ({ action, query }) => {
-  const [actionState, setActionState] = useState(action);
-  const [queryState, setQueryState] = useState(query);
+const Entry = ({ action, query, setQuery, setAction }) => {
+
   return (
     <div className={styles.entry}>
 
       <input
         className={styles.key}
-        value={actionState}
-        onChange={e => setActionState(e.target.value)}
+        value={action}
+        onChange={e => setAction(e.target.value)}
       />
 
       <textarea
         className={styles.value}
-        value={queryState}
-        onChange={e => setQueryState(e.target.value)}
+        value={query}
+        onChange={e => setQuery(e.target.value)}
       />
 
     </div>
