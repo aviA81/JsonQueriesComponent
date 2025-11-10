@@ -1,0 +1,42 @@
+.fullScreen {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 123;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.centerBox {
+  background-color: black;
+  padding: 2rem;
+  border: none;
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.header {
+  color: red;
+}
+
+.paragraph {
+  color: white;
+}
+
+.delete {
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: .3rem;
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  padding: .5rem;
+}

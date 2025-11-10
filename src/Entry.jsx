@@ -1,6 +1,6 @@
 import styles from './entry.module.css';
 
-const Entry = ({ action, query, setQuery, setAction }) => {
+const Entry = ({ action, query, setQuery, setAction, deleteEntry }) => {
 
   return (
     <div className={styles.entry}>
@@ -16,6 +16,8 @@ const Entry = ({ action, query, setQuery, setAction }) => {
         value={query}
         onChange={e => setQuery(e.target.value)}
       />
+
+      <button className={styles.delete} onClick={deleteEntry}>Delete</button>
 
     </div>
   );
