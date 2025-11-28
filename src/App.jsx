@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import Entry from './Entry';
 import Dialog from './Dialog';
+import styles from './app.module.css';
 import { generateId, loadDataHook, postQueries } from './hooks';
 
 function App() {
@@ -59,26 +60,32 @@ function App() {
 
   return (
     <>
-      <button onClick={() => console.log(queries)}>log state</button>
-      <button onClick={addEntry}>Add Entry</button>
-      <button onClick={() => setDisplayDialog(true)}>Post Queries</button>
+      <div className={styles.header}>
+        <button onClick={() => console.log(queries)}>log state</button>
+        <button onClick={addEntry}>Add Entry</button>
+        <button onClick={() => setDisplayDialog(true)}>Post Queries</button>
+      </div>
 
-      {Object.entries(queries).map(([action, query]) => (
-        <Entry
-          key={keyMapRef.current[action]}
-          action={action}
-          query={query}
-          setQuery={(newQuery) => setQuery(action, newQuery)}
-          setAction={(newAction) => setAction(action, newAction)}
-          deleteEntry={() => deleteEntry(action)}
-        />
-      ))}
+      <div className={styles.page}>
 
-      {displayDialog &&
-        <Dialog
-          postQueries={() => postQueries(queries)}
-          close={() => setDisplayDialog(false)}
-        />}
+        {Object.entries(queries).map(([action, query]) => (
+          <Entry
+            key={keyMapRef.current[action]}
+            action={action}
+            query={query}
+            setQuery={(newQuery) => setQuery(action, newQuery)}
+            setAction={(newAction) => setAction(action, newAction)}
+            deleteEntry={() => deleteEntry(action)}
+          />
+        ))}
+
+        {displayDialog &&
+          <Dialog
+            postQueries={() => postQueries(queries)}
+            close={() => setDisplayDialog(false)}
+          />}
+
+      </div>
     </>
   );
 }

@@ -1,0 +1,19 @@
+.header {
+  background-color: beige;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  border-bottom: black solid 2px;
+  padding: 1rem;
+}
+
+.header>button {
+  padding: .5rem;
+  margin: 0 2rem;
+  border-radius: 4px;
+}
+
+.page {
+  padding-top: 4rem;
+}
