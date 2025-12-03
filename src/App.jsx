@@ -5,58 +5,64 @@ import styles from './app.module.css';
 import { generateId, loadDataHook, postQueries } from './hooks';
 
 function App() {
-  const [queries, setQueries] = useState({});
-  const keyMapRef = useRef({});
+  const [queries, setQueries] = useState([]);
+  const defaultQueriesRef = useRef({});
   const [displayDialog, setDisplayDialog] = useState(false);
+  const [refreshQueries, setRefreshQueries] = useState(0);
 
   // fetch the queries
   useEffect(() => {
     async function fetchQueries() {
       const json = await loadDataHook();
       if (json.success) {
-        setQueries(json.data);
+        const list = Object.entries(json.data).map(([action, query]) => ({
+          id: generateId(),
+          action,
+          query
+        }));
+        setQueries(list);
+        defaultQueriesRef.current = list;
       }
     }
     fetchQueries();
-  }, []);
-
-  // Change the value of a query
-  function setQuery(key, value) {
-    setQueries({ ...queries, [key]: value });
-  }
-
-  // Change the name of an action
-  function setAction(oldKey, newKey) {
-    keyMapRef.current[newKey] = keyMapRef.current[oldKey];
-    delete keyMapRef.current[oldKey];
-
-    // Reconstructing the object so that the entries are in the same order in the new object so React will render them in the same order.
-    const newEntries = Object.entries(queries).map(([key, value]) => {
-      if (key === oldKey) return [newKey, value];
-      return [key, value];
-    });
-
-    const updated = Object.fromEntries(newEntries);
-    setQueries(updated);
-  }
+  }, [refreshQueries]);
 
   // Add an entry
   function addEntry() {
-    setQueries({ ...queries, 'Action': 'Query' });
+    const id = generateId();
+    setQueries(prev => [{ id, action: "Action", query: "Query" }, ...prev]);
+    scroll(0, 0);
+  }
+
+  // Change the value of a query
+  function setQuery(id, newQuery) {
+    setQueries(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, query: newQuery } : item
+      )
+    );
+  }
+
+  // Rename an action
+  function setAction(id, newAction) {
+    setQueries(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, action: newAction } : item
+      )
+    );
   }
 
   // Delete an entry
-  function deleteEntry(action) {
-    delete keyMapRef.current[action];
-
-    const newEntries = Object.entries(queries).filter(([key]) => key !== action);
-    const updated = Object.fromEntries(newEntries);
-    setQueries(updated);
+  function deleteEntry(id) {
+    setQueries(prev => prev.filter(item => item.id !== id));
   }
 
-  Object.keys(queries).forEach(key => {
-    if (!keyMapRef.current[key]) keyMapRef.current[key] = generateId();
-  });
+  async function PostAndRefreshQueries() {
+    // Transform array back to original { action: query } format
+    const obj = Object.fromEntries(queries.map(q => [q.action, q.query]));
+    await postQueries(obj);
+    setRefreshQueries(r => r + 1);
+  }
 
   return (
     <>
@@ -64,24 +70,29 @@ function App() {
         <button onClick={() => console.log(queries)}>log state</button>
         <button onClick={addEntry}>Add Entry</button>
         <button onClick={() => setDisplayDialog(true)}>Post Queries</button>
+        <span className={styles.pending}>
+          {JSON.stringify(defaultQueriesRef.current) !== JSON.stringify(queries)
+            &&
+            'Pending Changes'}
+        </span>
       </div>
 
       <div className={styles.page}>
 
-        {Object.entries(queries).map(([action, query]) => (
+        {queries.map(item => (
           <Entry
-            key={keyMapRef.current[action]}
-            action={action}
-            query={query}
-            setQuery={(newQuery) => setQuery(action, newQuery)}
-            setAction={(newAction) => setAction(action, newAction)}
-            deleteEntry={() => deleteEntry(action)}
+            key={item.id}
+            action={item.action}
+            query={item.query}
+            setQuery={q => setQuery(item.id, q)}
+            setAction={a => setAction(item.id, a)}
+            deleteEntry={() => deleteEntry(item.id)}
           />
         ))}
 
         {displayDialog &&
           <Dialog
-            postQueries={() => postQueries(queries)}
+            postQueries={PostAndRefreshQueries}
             close={() => setDisplayDialog(false)}
           />}
 
