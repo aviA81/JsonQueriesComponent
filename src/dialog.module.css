@@ -39,4 +39,34 @@
   font-family: Arial, sans-serif;
   font-size: 1rem;
   padding: .5rem;
+  margin: .5rem;
+}
+
+.backupEntry {
+  color: white;
+  padding: 1rem;
+  margin: 1rem;
+  font-size: 2rem;
+  border: none;
+  border-radius: 8px;
+  background-color: cornflowerblue;
+  width: 100%;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+.button {
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  background-color: darksalmon;
+}
+
+.button:hover {
+  background-color: rgba(233, 150, 122, 0.8);
+}
+
+.button:active {
+  font-style: italic;
 }

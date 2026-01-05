@@ -1,31 +1,48 @@
 import { useEffect, useState, useRef } from 'react';
 import Entry from './Entry';
+import Backups from './Backups';
 import Dialog from './Dialog';
 import styles from './app.module.css';
 import { generateId, loadDataHook, postQueries } from './hooks';
 
 function App() {
   const [queries, setQueries] = useState([]);
+  const backupList = useRef([]);
+  const [currentBackupName, setCurrentBackupName] = useState('queries');
   const defaultQueriesRef = useRef({});
   const [displayDialog, setDisplayDialog] = useState(false);
+  const [displayBackups, setDisplayBackups] = useState(false);
   const [refreshQueries, setRefreshQueries] = useState(0);
 
   // fetch the queries
   useEffect(() => {
     async function fetchQueries() {
       const json = await loadDataHook();
+      console.log();
       if (json.success) {
-        const list = Object.entries(json.data).map(([action, query]) => ({
+        backupList.current = json.data;
+        const list = Object.entries(json.data.queries).map(([action, query]) => ({
           id: generateId(),
           action,
           query
         }));
         setQueries(list);
-        defaultQueriesRef.current = list;
+        defaultQueriesRef.current = json.data.queries;
       }
     }
     fetchQueries();
   }, [refreshQueries]);
+
+  // Change the file source to a backup
+  useEffect(() => {
+    if (!backupList.current.queries) return;
+    const list = Object.entries(backupList.current[currentBackupName]).map(([action, query]) => ({
+      id: generateId(),
+      action,
+      query
+    }));
+    setQueries(list);
+  }, [currentBackupName]);
 
   // Add an entry
   function addEntry() {
@@ -67,11 +84,12 @@ function App() {
   return (
     <>
       <div className={styles.header}>
-        <button onClick={() => console.log(queries)}>log state</button>
+        <button onClick={() => { console.log(queries); }}>log state</button>
         <button onClick={addEntry}>Add Entry</button>
+        <button onClick={() => setDisplayBackups(true)}>Backups</button>
         <button onClick={() => setDisplayDialog(true)}>Post Queries</button>
         <span className={styles.pending}>
-          {JSON.stringify(defaultQueriesRef.current) !== JSON.stringify(queries)
+          {JSON.stringify(defaultQueriesRef.current) !== JSON.stringify(Object.fromEntries(queries.map(q => [q.action, q.query])))
             &&
             'Pending Changes'}
         </span>
@@ -89,6 +107,13 @@ function App() {
             deleteEntry={() => deleteEntry(item.id)}
           />
         ))}
+
+        {displayBackups &&
+          <Backups
+            setCurrentBackupName={setCurrentBackupName}
+            backupList={backupList.current}
+            close={() => setDisplayBackups(false)}
+          />}
 
         {displayDialog &&
           <Dialog
